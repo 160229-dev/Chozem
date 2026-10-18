@@ -1,0 +1,15 @@
+{
+  "id": "cookies",
+  "name": "Cookie 管理",
+  "version": "1.0.0",
+  "description": "按站点查看、删除、导出 Cookie，清理站点数据。",
+  "author": "Chozem",
+  "icon": "cookie",
+  "main": "plugin.js",
+  "permissions": [
+    "panel",
+    "cookies"
+  ],
+  "minAppVersion": "0.1.0",
+  "builtin": true
+}

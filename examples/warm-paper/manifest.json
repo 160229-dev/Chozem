@@ -1,0 +1,13 @@
+{
+  "id": "warm-paper",
+  "name": "暖纸",
+  "version": "1.0.0",
+  "description": "米黄纸感 + 深棕文字的主题包，可作为自己写主题的起点。",
+  "author": "Chozem",
+  "icon": "palette",
+  "main": "plugin.js",
+  "style": "style.css",
+  "permissions": [
+    "theme"
+  ]
+}

@@ -1,0 +1,40 @@
+
+
+#home-search .hs-submit svg {
+  display: none;
+}
+
+
+#home-search .hs-submit {
+  position: relative;
+  overflow: hidden;
+}
+
+#home-search .hs-submit::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: #fff7ec;
+}
+
+#home-search .hs-submit::after {
+  content: "🐶";
+  position: relative;
+  z-index: 1;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 21px;
+  line-height: 1;
+  display: block;
+  transform: translateY(-1px);
+}
+
+#home-search .hs-submit:hover::after {
+  animation: dog-head-wiggle 0.38s ease;
+}
+
+@keyframes dog-head-wiggle {
+  0%, 100% { transform: translateY(-1px) rotate(0deg); }
+  30% { transform: translateY(-1px) rotate(-10deg); }
+  65% { transform: translateY(-1px) rotate(8deg); }
+}

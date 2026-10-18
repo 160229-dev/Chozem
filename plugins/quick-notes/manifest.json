@@ -1,0 +1,12 @@
+{
+  "id": "quick-notes",
+  "name": "速记",
+  "version": "1.0.0",
+  "description": "随叫随到的便签小窗，内容自动保存在本地，按 Alt + N 唤出。",
+  "author": "Chozem",
+  "icon": "note",
+  "main": "plugin.js",
+  "style": "style.css",
+  "permissions": ["toolbar", "panel", "storage", "commands"],
+  "minAppVersion": "0.1.0"
+}

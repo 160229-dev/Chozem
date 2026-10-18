@@ -1,0 +1,16 @@
+{
+  "id": "palette",
+  "name": "命令面板",
+  "version": "1.0.0",
+  "description": "Ctrl + K 搜索全部操作与插件命令。",
+  "author": "Chozem",
+  "icon": "command",
+  "main": "plugin.js",
+  "permissions": [
+    "ui",
+    "commands"
+  ],
+  "minAppVersion": "0.1.0",
+  "builtin": true,
+  "locked": true
+}

@@ -1,0 +1,14 @@
+{
+  "id": "find",
+  "name": "页内查找",
+  "version": "1.0.0",
+  "description": "Ctrl + F 在当前页面中查找文字。",
+  "author": "Chozem",
+  "icon": "search",
+  "main": "plugin.js",
+  "permissions": [
+    "ui"
+  ],
+  "minAppVersion": "0.1.0",
+  "builtin": true
+}

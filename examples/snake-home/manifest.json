@@ -1,0 +1,15 @@
+{
+  "id": "snake-home",
+  "name": "首页贪吃蛇",
+  "version": "1.0.0",
+  "description": "在首页最右侧嵌一局贪吃蛇，方向键 / WASD 控制，最高分自动保存。",
+  "author": "Chozem",
+  "icon": "puzzle",
+  "main": "plugin.js",
+  "style": "style.css",
+  "permissions": [
+    "home",
+    "storage"
+  ],
+  "minAppVersion": "0.1.0"
+}

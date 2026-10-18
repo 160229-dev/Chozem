@@ -1,0 +1,12 @@
+{
+  "id": "midnight-theme",
+  "name": "午夜主题",
+  "version": "1.0.0",
+  "description": "把整张界面重绘成暖炭黑配色，示范插件如何覆盖主题变量。",
+  "author": "Chozem",
+  "icon": "moon",
+  "main": "plugin.js",
+  "style": "style.css",
+  "permissions": ["toolbar", "theme", "storage"],
+  "minAppVersion": "0.1.0"
+}

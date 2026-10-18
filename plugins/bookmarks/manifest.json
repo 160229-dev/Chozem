@@ -1,0 +1,17 @@
+{
+  "id": "bookmarks",
+  "name": "书签",
+  "version": "1.0.0",
+  "description": "一键收藏当前页面，随时从书签面板重访。",
+  "author": "Chozem",
+  "icon": "star",
+  "main": "plugin.js",
+  "permissions": [
+    "toolbar",
+    "panel",
+    "storage"
+  ],
+  "minAppVersion": "0.1.0",
+  "builtin": true,
+  "style": "style.css"
+}

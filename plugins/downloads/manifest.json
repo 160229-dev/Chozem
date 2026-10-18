@@ -1,0 +1,15 @@
+{
+  "id": "downloads",
+  "name": "下载管理",
+  "version": "1.0.0",
+  "description": "下载面板、进度、暂停与打开文件所在位置。",
+  "author": "Chozem",
+  "icon": "download",
+  "main": "plugin.js",
+  "permissions": [
+    "panel",
+    "downloads"
+  ],
+  "minAppVersion": "0.1.0",
+  "builtin": true
+}

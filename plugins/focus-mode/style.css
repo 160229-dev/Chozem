@@ -1,0 +1,53 @@
+
+
+#titlebar,
+#toolbar,
+#stage {
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.18s ease;
+}
+
+body.cho-focus #titlebar,
+body.cho-focus #toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.cho-focus #stage {
+  position: fixed;
+  inset: 0;
+}
+
+.cho-focus-exit {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(28, 28, 32, 0.72);
+  color: #f4f0e9;
+  font-size: 11.5px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(8px);
+  opacity: 0.32;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.cho-focus-exit:hover {
+  opacity: 1;
+  transform: translateY(1px);
+}
+
+.cho-focus-exit .ico {
+  width: 13px;
+  height: 13px;
+}

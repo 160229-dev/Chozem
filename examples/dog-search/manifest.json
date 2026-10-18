@@ -1,0 +1,14 @@
+{
+  "id": "dog-search",
+  "name": "狗头搜索",
+  "version": "1.0.0",
+  "description": "把首页的搜索按钮换成一只狗头，点一下就开始搜。",
+  "author": "Chozem",
+  "icon": "search",
+  "main": "plugin.js",
+  "style": "style.css",
+  "permissions": [
+    "ui"
+  ],
+  "minAppVersion": "0.1.0"
+}

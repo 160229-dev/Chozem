@@ -1,0 +1,16 @@
+{
+  "id": "settings",
+  "name": "设置",
+  "version": "1.0.0",
+  "description": "搜索引擎、隐私、下载、主题与插件管理。",
+  "author": "Chozem",
+  "icon": "settings",
+  "main": "plugin.js",
+  "permissions": [
+    "ui",
+    "settings"
+  ],
+  "minAppVersion": "0.1.0",
+  "builtin": true,
+  "locked": true
+}

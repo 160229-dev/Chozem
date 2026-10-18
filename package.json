@@ -1,0 +1,68 @@
+{
+  "name": "chozem",
+  "productName": "Chozem",
+  "version": "0.1.0",
+  "description": "A minimal browser where everything is a plugin.",
+  "main": "main/main.js",
+  "author": "Chozem",
+  "license": "MIT",
+  "scripts": {
+    "start": "node tools/start.js",
+    "dev": "node tools/start.js --dev",
+    "shot": "node tools/start.js --shot --disable-gpu --no-sandbox --in-process-gpu --disable-gpu-sandbox",
+    "plugin:zip": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/pack-plugin.ps1",
+    "dist": "electron-builder --win nsis --x64"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.chozem.browser",
+    "productName": "Chozem",
+    "copyright": "Copyright © 2026 Chozem contributors",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main/**/*",
+      "preload/**/*",
+      "ui/**/*",
+      "plugins/**/*",
+      "SKILL.md",
+      "README.md",
+      "LICENSE",
+      "package.json",
+      "!**/*.map",
+      "!**/.design/**",
+      "!**/examples/**"
+    ],
+    "win": {
+      "icon": "ui/assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "Chozem-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Chozem",
+      "uninstallDisplayName": "Chozem",
+      "deleteAppDataOnUninstall": false
+    },
+    "asar": true
+  }
+}

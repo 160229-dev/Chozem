@@ -1,0 +1,15 @@
+{
+  "id": "reader",
+  "name": "阅读模式",
+  "version": "1.0.0",
+  "description": "去掉网页噪音，把正文变成适合阅读的排版。",
+  "author": "Chozem",
+  "icon": "book",
+  "main": "plugin.js",
+  "permissions": [
+    "toolbar",
+    "page"
+  ],
+  "minAppVersion": "0.1.0",
+  "builtin": true
+}

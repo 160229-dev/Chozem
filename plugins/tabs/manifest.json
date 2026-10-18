@@ -1,0 +1,17 @@
+{
+  "id": "tabs",
+  "name": "标签页",
+  "version": "1.0.0",
+  "description": "顶部标签栏，支持新建、切换、关闭与拖拽排序。",
+  "author": "Chozem",
+  "icon": "plus",
+  "main": "plugin.js",
+  "permissions": [
+    "tabs",
+    "toolbar"
+  ],
+  "minAppVersion": "0.1.0",
+  "builtin": true,
+  "style": "style.css",
+  "locked": true
+}

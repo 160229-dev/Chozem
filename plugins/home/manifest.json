@@ -1,0 +1,16 @@
+{
+  "id": "home",
+  "name": "搜索首页",
+  "version": "1.0.0",
+  "description": "新标签页的图标、搜索框与搜索引擎切换。",
+  "author": "Chozem",
+  "icon": "search",
+  "main": "plugin.js",
+  "permissions": [
+    "home",
+    "ui"
+  ],
+  "minAppVersion": "0.1.0",
+  "builtin": true,
+  "locked": true
+}

@@ -1,0 +1,16 @@
+{
+  "id": "history",
+  "name": "历史记录",
+  "version": "1.0.0",
+  "description": "自动记录访问过的页面，可搜索、重访与清空。",
+  "author": "Chozem",
+  "icon": "reload",
+  "main": "plugin.js",
+  "permissions": [
+    "panel",
+    "storage"
+  ],
+  "minAppVersion": "0.1.0",
+  "builtin": true,
+  "style": "style.css"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "focus-mode",
+  "name": "专注模式",
+  "version": "1.0.0",
+  "description": "一键隐去工具栏与地址栏，把整个窗口交给网页本身。按 Esc 退出。",
+  "author": "Chozem",
+  "icon": "eye",
+  "main": "plugin.js",
+  "style": "style.css",
+  "permissions": ["toolbar", "ui", "commands"],
+  "minAppVersion": "0.1.0"
+}

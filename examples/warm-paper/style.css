@@ -1,0 +1,4 @@
+
+.home-glow { background: none !important; }
+#home::before { opacity: 0.18; }
+.brand-name { font-weight: 700; letter-spacing: 0.01em; }

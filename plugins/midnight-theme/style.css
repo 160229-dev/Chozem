@@ -1,0 +1,28 @@
+
+
+html[data-chozem-midnight] #home::before {
+  opacity: 0.22;
+}
+
+html[data-chozem-midnight] .home-glow {
+  background:
+    radial-gradient(560px 340px at 28% 24%, rgba(229, 161, 92, 0.18), transparent 70%),
+    radial-gradient(620px 380px at 74% 36%, rgba(126, 86, 44, 0.20), transparent 72%);
+}
+
+html[data-chozem-midnight] #home-search {
+  background: #19181a;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-chozem-midnight] .hs-engine {
+  background: #232226;
+}
+
+html[data-chozem-midnight] .home-widget {
+  background: #161517;
+}
+
+html[data-chozem-midnight] .brand-name {
+  letter-spacing: -0.03em;
+}
