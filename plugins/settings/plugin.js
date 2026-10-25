@@ -336,6 +336,20 @@ window.CHO = window.CHO || {};
 
       host.appendChild(
         row(
+          '网站 Cookie 权限',
+          '全部允许时不再询问；选择「每个网站询问」后，新网站第一次访问会弹出请求，拒绝的站点无法保存 Cookie。',
+          seg(
+            [
+              { value: 'allowAll', label: '全部允许' },
+              { value: 'ask', label: '每个网站询问' },
+            ],
+            p.cookieConsent || 'allowAll',
+            (value) => this.patch({ privacy: { cookieConsent: value } })
+          )
+        )
+      );
+      host.appendChild(
+        row(
           '阻止第三方 Cookie',
           '跨站请求不携带 Cookie。开启后少数网站可能无法保持登录（实验性）。',
           sw(p.blockThirdPartyCookies, (value) => this.patch({ privacy: { blockThirdPartyCookies: value } }))

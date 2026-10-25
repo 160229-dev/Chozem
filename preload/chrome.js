@@ -34,6 +34,11 @@ contextBridge.exposeInMainWorld('chozem', {
   settings: {
     get: () => ipcRenderer.invoke('settings:get'),
     set: (patch) => ipcRenderer.invoke('settings:set', patch),
+    onChange: (cb) => {
+      const listener = (event, data) => cb(data);
+      ipcRenderer.on('settings:changed', listener);
+      return () => ipcRenderer.removeListener('settings:changed', listener);
+    },
   },
   theme: {
     set: (theme) => ipcRenderer.invoke('theme:set', theme),
@@ -96,6 +101,10 @@ contextBridge.exposeInMainWorld('chozem', {
   page: {
     capture: (id) => ipcRenderer.invoke('page:capture', { id }),
     print: (id) => ipcRenderer.invoke('page:print', { id }),
+    devtools: (id) => ipcRenderer.invoke('page:devtools', { id }),
+  },
+  ui: {
+    devtools: () => ipcRenderer.invoke('ui:devtools'),
   },
   context: {
     setItems: (items) => ipcRenderer.invoke('context:setItems', items),

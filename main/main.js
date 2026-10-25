@@ -222,13 +222,11 @@ function registerIpc() {
   
   handle('settings:get', () => settings.get());
   handle('settings:set', (e, patch) => {
-    const next = settings.set(patch);
     if (patch && patch.theme) {
       nativeTheme.themeSource = patch.theme;
       broadcast('theme:changed', { theme: patch.theme, dark: nativeTheme.shouldUseDarkColors });
     }
-    broadcast('settings:changed', next);
-    return next;
+    return settings.set(patch);
   });
 
   handle('theme:set', (e, theme) => {
@@ -297,6 +295,28 @@ function registerIpc() {
   handle('win:setTitle', (event, title) => {
     currentWindow(event).setTitle(String(title || 'Chozem'));
     return true;
+  });
+
+  handle('page:devtools', (e, { id }) => {
+    const wc = webContents.fromId(Number(id));
+    if (!wc || wc.isDestroyed()) return false;
+    try {
+      wc.openDevTools({ mode: 'detach' });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  });
+
+  handle('ui:devtools', (event) => {
+    const win = currentWindow(event);
+    if (!win) return false;
+    try {
+      win.webContents.openDevTools({ mode: 'detach' });
+      return true;
+    } catch (_) {
+      return false;
+    }
   });
 
   handle('page:capture', async (e, { id }) => {
@@ -427,7 +447,11 @@ function attachGuestHandlers() {
 app.whenReady().then(async () => {
   Menu.setApplicationMenu(null);
   settings = new Settings(app.getPath('userData'));
+  if (shotMode) settings.set({ onboarding: { done: true } });
   nativeTheme.themeSource = settings.get().theme || 'system';
+
+  
+  settings.onChange((next) => broadcast('settings:changed', next));
 
   browser = new Browser({ settings, broadcast });
   browser.init();
@@ -899,6 +923,134 @@ async function runShots() {
         true
       );
     }
+
+    
+    const welcomeStep1 = await win.webContents.executeJavaScript(
+      `(async function(){
+        try {
+          CHO.view.goHome(false);
+          const svc = CHO.services.get('welcome');
+          if (!svc) return 'no service';
+          svc.open();
+          await new Promise(r => setTimeout(r, 900));
+          const layer = document.getElementById('welcome-layer');
+          if (!layer) return 'no layer';
+          const v = layer.querySelectorAll('video');
+          const box = layer.querySelector('.welcome-media').getBoundingClientRect();
+          return {
+            videos: v.length,
+            title: layer.querySelector('.welcome-title').textContent,
+            playing: !v[0].paused,
+            primary: layer.querySelector('.welcome-primary').textContent,
+            skip: !layer.querySelector('.welcome-skip').hidden,
+            disagree: !layer.querySelector('.welcome-disagree').hidden,
+            media: [Math.round(box.left), Math.round(box.top), Math.round(box.width), Math.round(box.height)],
+            card: Math.round(layer.querySelector('.welcome-card').getBoundingClientRect().height)
+          };
+        } catch (e) { return 'ERR ' + e.stack; }
+      })()`,
+      true
+    );
+    console.log('[shot] welcome-1:', JSON.stringify(welcomeStep1));
+    await sleep(400);
+    img = await win.webContents.capturePage();
+    fs.writeFileSync(path.join(outDir, 'shot-welcome-1.png'), img.toPNG());
+
+    const welcomeStep2 = await win.webContents.executeJavaScript(
+      `(async function(){
+        try {
+          const layer = document.getElementById('welcome-layer');
+          layer.querySelector('.welcome-primary').click();
+          await new Promise(r => setTimeout(r, 1100));
+          const v = layer.querySelectorAll('video');
+          const box = layer.querySelector('.welcome-media').getBoundingClientRect();
+          return {
+            title: layer.querySelector('.welcome-title').textContent,
+            primary: layer.querySelector('.welcome-primary').textContent,
+            skip: !layer.querySelector('.welcome-skip').hidden,
+            disagree: !layer.querySelector('.welcome-disagree').hidden,
+            second: v[1].classList.contains('is-on'),
+            playing: !v[1].paused,
+            media: [Math.round(box.left), Math.round(box.top), Math.round(box.width), Math.round(box.height)],
+            card: Math.round(layer.querySelector('.welcome-card').getBoundingClientRect().height)
+          };
+        } catch (e) { return 'ERR ' + e.stack; }
+      })()`,
+      true
+    );
+    console.log('[shot] welcome-2:', JSON.stringify(welcomeStep2));
+    await sleep(500);
+    img = await win.webContents.capturePage();
+    fs.writeFileSync(path.join(outDir, 'shot-welcome-2.png'), img.toPNG());
+
+    const welcomeDisagree = await win.webContents.executeJavaScript(
+      `(async function(){
+        try {
+          document.querySelector('.welcome-disagree').click();
+          await new Promise(r => setTimeout(r, 500));
+          return { closed: !document.getElementById('welcome-layer'), consent: CHO.api.settings.privacy.cookieConsent };
+        } catch (e) { return 'ERR ' + e.stack; }
+      })()`,
+      true
+    );
+    console.log('[shot] welcome-disagree:', JSON.stringify(welcomeDisagree));
+
+    const welcomeAgree = await win.webContents.executeJavaScript(
+      `(async function(){
+        try {
+          const svc = CHO.services.get('welcome');
+          svc.open();
+          await new Promise(r => setTimeout(r, 500));
+          document.querySelector('.welcome-primary').click();
+          await new Promise(r => setTimeout(r, 900));
+          document.querySelector('.welcome-primary').click();
+          await new Promise(r => setTimeout(r, 500));
+          return {
+            closed: !document.getElementById('welcome-layer'),
+            consent: CHO.api.settings.privacy.cookieConsent,
+            done: CHO.api.settings.onboarding.done
+          };
+        } catch (e) { return 'ERR ' + e.stack; }
+      })()`,
+      true
+    );
+    console.log('[shot] welcome-agree:', JSON.stringify(welcomeAgree));
+
+    
+    const darkGlass = await win.webContents.executeJavaScript(
+      `(async function(){
+        try {
+          const svc = CHO.services.get('settings');
+          const read = (sel) => {
+            const el = document.querySelector(sel);
+            if (!el) return null;
+            const cs = getComputedStyle(el);
+            return { bg: cs.backgroundColor, filter: cs.backdropFilter };
+          };
+          await CHO.api.setTheme('light');
+          await new Promise(r => setTimeout(r, 350));
+          const light = { search: read('#home-search'), toolbar: read('#toolbar') };
+          await CHO.api.setTheme('dark');
+          await new Promise(r => setTimeout(r, 350));
+          svc.open('general');
+          await new Promise(r => setTimeout(r, 500));
+          const report = {
+            light,
+            theme: document.documentElement.dataset.theme,
+            search: read('#home-search'),
+            toolbar: read('#toolbar'),
+            modal: read('.modal.settings'),
+            tab: read('.tab.active')
+          };
+          if (svc.ctl) svc.ctl.close();
+          await CHO.api.setTheme('light');
+          await new Promise(r => setTimeout(r, 300));
+          return report;
+        } catch (e) { return 'ERR ' + e.stack; }
+      })()`,
+      true
+    );
+    console.log('[shot] dark-no-glass:', JSON.stringify(darkGlass));
 
     console.log('[shot] done');
   } catch (err) {

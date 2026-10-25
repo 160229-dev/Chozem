@@ -1,0 +1,15 @@
+{
+  "id": "liquid-glass",
+  "name": "液态玻璃",
+  "version": "1.0.0",
+  "description": "Apple 风格的液态玻璃材质：边缘折射、跟随指针的镜面高光、半透明面板。停用后回到纯色界面。",
+  "author": "Chozem",
+  "icon": "palette",
+  "main": "plugin.js",
+  "style": "style.css",
+  "permissions": [
+    "ui",
+    "theme"
+  ],
+  "minAppVersion": "0.1.5"
+}

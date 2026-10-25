@@ -437,11 +437,13 @@ window.CHO = window.CHO || {};
       } catch (_) {}
     },
 
-    openDevTools() {
-      const session = this.active();
-      if (!session) return;
+    async openDevTools() {
+      const id = this.webContentsId();
       try {
-        session.el.openDevTools();
+        if (id && (await window.chozem.page.devtools(id))) return;
+      } catch (_) {}
+      try {
+        await window.chozem.ui.devtools();
       } catch (_) {}
     },
 

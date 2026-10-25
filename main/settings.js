@@ -19,10 +19,15 @@ const DEFAULTS = {
   downloadDir: '',
   askWhereToSave: false,
   zoom: 1,
+  onboarding: { done: false },
   privacy: {
     blockThirdPartyCookies: false,
     doNotTrack: true,
     clearOnExit: false,
+    
+    cookieConsent: 'allowAll',
+    cookieAllowed: [],
+    cookieDenied: [],
   },
   window: { width: 1240, height: 820, x: null, y: null, maximized: false },
   plugins: { disabled: [], installed: [] },

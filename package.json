@@ -1,17 +1,20 @@
 {
   "name": "chozem",
   "productName": "Chozem",
-  "version": "0.1.0",
+  "version": "0.1.5-beta",
   "description": "A minimal browser where everything is a plugin.",
   "main": "main/main.js",
   "author": "Chozem",
   "license": "MIT",
+  "homepage": "https://github.com/chozem/chozem",
   "scripts": {
     "start": "node tools/start.js",
     "dev": "node tools/start.js --dev",
     "shot": "node tools/start.js --shot --disable-gpu --no-sandbox --in-process-gpu --disable-gpu-sandbox",
     "plugin:zip": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/pack-plugin.ps1",
-    "dist": "electron-builder --win nsis --x64"
+    "dist": "electron-builder --win nsis --x64",
+    "dist:linux": "electron-builder --linux deb --x64",
+    "dist:linux:arm64": "electron-builder --linux deb --arm64"
   },
   "dependencies": {
     "adm-zip": "^0.5.16"
@@ -63,6 +66,29 @@
       "uninstallDisplayName": "Chozem",
       "deleteAppDataOnUninstall": false
     },
-    "asar": true
+    "asar": true,
+    "linux": {
+      "target": [
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Network;WebBrowser",
+      "icon": "build/icons",
+      "maintainer": "Chozem <chozem@users.noreply.github.com>",
+      "synopsis": "A minimal browser where everything is a plugin",
+      "description": "Chozem is a minimal browser whose tabs, start page, settings, downloads and cookie manager are all built-in plugins. The kernel only owns windows, web views, sessions and plugin loading.",
+      "artifactName": "Chozem_${version}_${arch}.${ext}",
+      "desktop": {
+        "entry": {
+          "Name": "Chozem",
+          "Comment": "A minimal browser where everything is a plugin",
+          "Categories": "Network;WebBrowser;"
+        }
+      }
+    }
   }
 }

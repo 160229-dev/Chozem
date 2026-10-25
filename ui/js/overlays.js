@@ -353,23 +353,41 @@ window.CHO = window.CHO || {};
 
     render(req) {
       this.destroy();
+      const isCookie = req.permission === 'cookies';
       const remember = U.el('input', { type: 'checkbox' });
       const card = U.el(
         'div',
         { class: 'perm-card', id: 'perm-card' },
-        U.el('div', { class: 'perm-head' }, U.svg('shield'), U.el('span', { text: '权限请求' })),
+        U.el(
+          'div',
+          { class: 'perm-head' },
+          U.svg(isCookie ? 'cookie' : 'shield'),
+          U.el('span', { text: isCookie ? 'Cookie 权限' : '权限请求' })
+        ),
         U.el(
           'div',
           { class: 'perm-body' },
-          `${req.origin} 请求${req.label}`,
+          isCookie ? '允许此网站保存 Cookie？之后访问会自动带上。' : `${req.origin} 请求${req.label}`,
           U.el('div', { class: 'perm-origin', text: req.origin })
         ),
         U.el(
           'div',
           { class: 'perm-actions' },
-          U.el('label', { class: 'perm-remember' }, remember, U.el('span', { text: '记住此站点' })),
-          U.el('button', { class: 'btn btn-ghost', type: 'button', text: '拒绝', onclick: () => this.answer(req, false, remember.checked) }),
-          U.el('button', { class: 'btn btn-primary', type: 'button', text: '允许', onclick: () => this.answer(req, true, remember.checked) })
+          isCookie
+            ? U.el('span', { class: 'perm-remember', text: '此选择会被记住' })
+            : U.el('label', { class: 'perm-remember' }, remember, U.el('span', { text: '记住此站点' })),
+          U.el('button', {
+            class: 'btn btn-ghost',
+            type: 'button',
+            text: '拒绝',
+            onclick: () => this.answer(req, false, isCookie ? true : remember.checked),
+          }),
+          U.el('button', {
+            class: 'btn btn-primary',
+            type: 'button',
+            text: '允许',
+            onclick: () => this.answer(req, true, isCookie ? true : remember.checked),
+          })
         )
       );
       document.body.appendChild(card);

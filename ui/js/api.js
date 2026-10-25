@@ -44,6 +44,12 @@ window.CHO = window.CHO || {};
       return this.settings;
     },
 
+    applySettings(next) {
+      if (!next) return;
+      this.settings = next;
+      bus.emit('settings', next);
+    },
+
     async setTheme(theme) {
       const res = await window.chozem.theme.set(theme);
       this.settings.theme = theme;

@@ -213,6 +213,7 @@ window.CHO = window.CHO || {};
         { passive: true }
       );
       window.chozem.on('downloads:list', (list) => CHO.bus.emit('downloads:list', list));
+      window.chozem.on('settings:changed', (next) => CHO.api.applySettings(next));
       window.chozem.on('context:item', (payload) => CHO.dispatchContextItem(payload && payload.id));
       window.chozem.on('cookies:changed', () => CHO.bus.emit('cookies:changed'));
 

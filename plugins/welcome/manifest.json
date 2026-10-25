@@ -1,0 +1,12 @@
+{
+  "id": "welcome",
+  "name": "欢迎引导",
+  "version": "1.0.0",
+  "description": "首次启动时播放介绍动画，并询问是否允许所有网站使用 Cookie。",
+  "author": "Chozem",
+  "icon": "play",
+  "main": "plugin.js",
+  "style": "style.css",
+  "permissions": ["ui", "settings"],
+  "minAppVersion": "0.1.5"
+}

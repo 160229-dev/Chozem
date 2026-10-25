@@ -68,6 +68,7 @@ class Browser {
     this._dlTimer = null;
     this._pendingPerms = new Map();
     this._allowedOrigins = new Set();
+    this._cookieAsked = new Set();
   }
 
   init() {
@@ -76,6 +77,7 @@ class Browser {
     this.setupDownloads();
     this.setupPermissions();
     this.setupHeaders();
+    this.setupCookieGuard();
     this.setupBlocking();
     this.setupCookieWatch();
     this.setupWebContents();
@@ -268,9 +270,13 @@ class Browser {
   respondPermission(id, allow, remember) {
     const entry = this._pendingPerms.get(id);
     if (!entry) return false;
-    clearTimeout(entry.timer);
+    if (entry.timer) clearTimeout(entry.timer);
     this._pendingPerms.delete(id);
-    if (allow && remember) this._allowedOrigins.add(`${entry.origin}|${entry.permission}`);
+    if (entry.permission === 'cookies') {
+      this.setCookieDecision(entry.origin, !!allow);
+    } else if (allow && remember) {
+      this._allowedOrigins.add(`${entry.origin}|${entry.permission}`);
+    }
     try {
       entry.callback(!!allow);
     } catch (_) {}
@@ -327,8 +333,85 @@ class Browser {
           }
         } catch (_) {}
       }
+      
+      if (headers.Cookie && this.cookieMode() === 'ask') {
+        try {
+          if (this.cookieDecision(new URL(details.url).origin) === 'deny') delete headers.Cookie;
+        } catch (_) {}
+      }
       callback({ requestHeaders: headers });
     });
+  }
+
+  
+
+  cookieMode() {
+    return this.settings.get().privacy.cookieConsent === 'ask' ? 'ask' : 'allowAll';
+  }
+
+  cookieDecision(origin) {
+    const privacy = this.settings.get().privacy;
+    if ((privacy.cookieAllowed || []).includes(origin)) return 'allow';
+    if ((privacy.cookieDenied || []).includes(origin)) return 'deny';
+    return '';
+  }
+
+  setupCookieGuard() {
+    this.ses.webRequest.onHeadersReceived((details, callback) => {
+      if (this.cookieMode() !== 'ask') return callback({});
+      const headers = details.responseHeaders || {};
+      const key = Object.keys(headers).find((name) => name.toLowerCase() === 'set-cookie');
+      if (!key) return callback({});
+      let denied = false;
+      try {
+        denied = this.cookieDecision(new URL(details.url).origin) === 'deny';
+      } catch (_) {}
+      if (!denied) return callback({});
+      const next = Object.assign({}, headers);
+      delete next[key];
+      callback({ responseHeaders: next });
+    });
+  }
+
+  maybeAskCookies(url) {
+    if (this.cookieMode() !== 'ask') return;
+    if (!/^https?:/i.test(url || '')) return;
+    let origin;
+    try {
+      origin = new URL(url).origin;
+    } catch (_) {
+      return;
+    }
+    if (this.cookieDecision(origin) || this._cookieAsked.has(origin)) return;
+    this._cookieAsked.add(origin);
+
+    const id = `c${Date.now().toString(36)}${++this._seq}`;
+    this._pendingPerms.set(id, { callback: () => {}, timer: null, permission: 'cookies', origin });
+    this.broadcast('perm:ask', {
+      id,
+      permission: 'cookies',
+      label: '在此网站存储 Cookie',
+      origin,
+      sticky: true,
+    });
+  }
+
+  async setCookieDecision(origin, allow) {
+    const privacy = this.settings.get().privacy;
+    const allowed = (privacy.cookieAllowed || []).filter((item) => item !== origin);
+    const denied = (privacy.cookieDenied || []).filter((item) => item !== origin);
+    if (allow) allowed.push(origin);
+    else denied.push(origin);
+    this.settings.set({ privacy: { cookieAllowed: allowed.slice(-400), cookieDenied: denied.slice(-400) } });
+
+    if (!allow) {
+      try {
+        await this.ses.clearStorageData({ origin, storages: ['cookies'] });
+      } catch (_) {}
+      this.broadcast('cookies:changed', null);
+    }
+    this.broadcast('cookies:consent', { origin, allow });
+    return true;
   }
 
   setupCookieWatch() {
@@ -353,6 +436,9 @@ class Browser {
         }
         return { action: 'deny' };
       });
+
+      
+      contents.on('did-navigate', (event, url) => this.maybeAskCookies(url));
     });
   }
 
