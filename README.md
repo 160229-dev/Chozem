@@ -6,7 +6,8 @@ Chozem keeps the kernel deliberately small — window, web views, sessions, plug
 tabs, the home page, settings, downloads, cookies, bookmarks and even the command palette as
 **built-in plugins**. Turn a plugin off and that feature genuinely disappears from the UI.
 
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-6e6e73)](#requirements)
+[![Version](https://img.shields.io/badge/version-0.1.5--beta-6e6e73)](#install)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-6e6e73)](#install)
 [![Electron](https://img.shields.io/badge/Electron-33-47848F?logo=electron&logoColor=white)](#architecture)
 [![License](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 
@@ -18,7 +19,7 @@ Most browsers are a monolith with an extension API bolted on. Chozem flips that 
 is a thin shell, and every user-facing feature is a removable plugin written against the same public
 API a third-party plugin would use. It is a browser you can rewire from the inside.
 
-- **Kernel ≈ 5.4k lines** (main process + shell + styles). **13 built-in plugins ≈ 2.4k lines.**
+- **Kernel ≈ 5.4k lines** (main process + shell + styles). **15 built-in plugins ≈ 2.9k lines.**
 - **No framework, no build step.** Plain DOM, plain CSS, one `CHO` namespace.
 - **Plugins are ZIP files.** Drop one on the window; it installs, loads and can be disabled again.
 
@@ -29,8 +30,11 @@ API a third-party plugin would use. It is a browser you can rewire from the insi
 - **Start page as a plugin** — search, engine indicator, extension points for home widgets.
 - **Everything is replaceable** — hide the toolbar, build a sidebar, restyle the tab strip, inject
   page CSS/JS, block requests, add settings pages.
-- **Apple-gray + liquid glass** — SVG displacement refraction in `backdrop-filter`, specular
-  highlights that follow the pointer, translucent panels.
+- **First run is a plugin too** — `welcome` plays the intro animation and asks once whether sites may
+  store cookies. Skip it and it never returns; replay it from `Ctrl+K`.`
+- **Apple-gray, with optional liquid glass** — in the light theme the chrome uses a glass material
+  (SVG displacement refraction, pointer-tracking specular highlights, translucent panels) shipped as
+  a plugin you can switch off. Dark mode is always flat and solid.
 - **Per-tab isolation of concerns** — one `<webview>` per tab, shared `persist:chozem` session.
 
 ## Built-in plugins
@@ -41,6 +45,8 @@ API a third-party plugin would use. It is a browser you can rewire from the insi
 | `tabs` | Tab strip, new/close/reorder, badges | the tab strip is gone |
 | `home` | Start page: logo, search field, engine chip, widget slot | new tabs are blank |
 | `palette` | `Ctrl+K` command palette | the shortcut does nothing |
+| `welcome` | First-run intro videos + one-time cookie consent | new profiles skip the intro |
+| `liquid-glass` | Liquid-glass material in light mode: refraction, specular highlights | flat solid surfaces |
 | `downloads` | Download panel, progress, pause/open/reveal | toolbar download button hides |
 | `cookies` | Per-site cookie viewer / delete / export | cookie entry hides |
 | `find` | `Ctrl+F` in-page search | shortcut does nothing |
@@ -54,13 +60,37 @@ API a third-party plugin would use. It is a browser you can rewire from the insi
 `settings`, `tabs`, `home` and `palette` are marked `locked` — they cannot be disabled, so the
 browser always has a way back.
 
-## Install (Windows)
+## Install
 
-Grab the latest `Chozem-Setup-x.y.z.exe` from **Releases** and run it. The installer is per-user,
-lets you pick the folder, and creates desktop / Start Menu shortcuts plus an uninstaller.
+### Windows
+
+Grab `Chozem-Setup-0.1.5-beta.exe` from **Releases** and run it. The installer is per-user, lets you
+pick the folder, and creates desktop / Start Menu shortcuts plus an uninstaller.
 
 > The build is not code-signed yet, so SmartScreen may warn on first run:
 > **More info → Run anyway**. Builds from source avoid that entirely.
+
+### Linux (Debian / Ubuntu)
+
+Pick the package that matches your CPU. Debian calls 64-bit x86 **`amd64`** — that is the same
+architecture Windows calls **x64**, and it is what almost every Intel / AMD machine needs.
+
+| Machine | Package |
+| --- | --- |
+| Intel / AMD (x64) | `Chozem_0.1.5-beta_amd64.deb` |
+| ARM64 (Raspberry Pi 4/5, Snapdragon laptops, ARM VMs) | `Chozem_0.1.5-beta_arm64.deb` |
+
+```bash
+sudo dpkg -i Chozem_0.1.5-beta_amd64.deb     # or the arm64 one
+sudo apt-get install -f                      # only if dependencies are missing
+chozem                                       # or launch "Chozem" from the app grid
+```
+
+`dpkg` refuses a package whose architecture does not match the machine, so installing the wrong one
+fails cleanly with `package architecture (amd64) does not match system (arm64)`.
+
+The package installs to `/opt/Chozem`, adds a desktop entry and an icon, and registers with the
+system package manager (`sudo apt remove chozem` to uninstall).
 
 ## Quick start
 
@@ -88,18 +118,22 @@ Requirements: Node.js 18+, Windows 10/11, macOS or Linux. User data lives in
 | `npm run dev` | Launch with DevTools attached to the UI |
 | `npm run shot` | Self-test: screenshots + plugin install/enable/badge checks |
 | `npm run dist` | Build the Windows installer into `dist/` (NSIS) |
+| `npm run dist:linux` | Build the Linux `.deb` into `dist/` (x64 / amd64) |
+| `npm run dist:linux:arm64` | Build the Linux `.deb` for ARM64 |
 | `npm run plugin:zip -- -Path plugins/foo` | Package a plugin folder into a ZIP |
 
 ## Packaging
 
 ```bash
-npm run dist
-# → dist/Chozem-Setup-0.1.0.exe
+npm run dist                # → dist/Chozem-Setup-0.1.5-beta.exe
+npm run dist:linux          # → dist/Chozem_0.1.5-beta_amd64.deb
+npm run dist:linux:arm64    # → dist/Chozem_0.1.5-beta_arm64.deb
 ```
 
-The NSIS target is configured in `package.json` under `build`: per-user install, optional install
-directory, desktop and Start Menu shortcuts, uninstaller, and user data preserved on uninstall.
-CI builds the same artifact when a `v*` tag is pushed (see `.github/workflows/release.yml`).
+Both targets are configured in `package.json` under `build`. Windows uses NSIS (per-user install,
+optional directory, shortcuts, uninstaller, user data preserved); Linux uses a Debian package
+(`/opt/Chozem`, desktop entry, icon, `dpkg` integration).
+CI builds both artifacts when a `v*` tag is pushed (see `.github/workflows/release.yml`).
 
 ## Architecture
 
@@ -116,7 +150,7 @@ ui/              the browser chrome itself (a local HTML app)
   js/view.js     multi-view manager behind Cho.web
   js/plugins.js  plugin host + API injection
   js/app.js      shell wiring, shortcuts, routes, pointer specular
-plugins/         13 built-in plugins, each a self-contained folder
+plugins/         15 built-in plugins, each a self-contained folder
 SKILL.md         the plugin development specification (feed it to an AI)
 examples/        installable demo plugins + ZIPs
 ```
@@ -188,6 +222,21 @@ get a working plugin back.
 | [`examples/dog-search.zip`](examples/dog-search.zip) | pure-CSS restyling of the start page |
 | [`examples/snake-home.zip`](examples/snake-home.zip) | a Canvas game embedded on the home page |
 
+## First run
+
+On a fresh profile the built-in `welcome` plugin shows a two-step intro: a short brand animation,
+then a second clip with two buttons — **Don't allow** and **Allow** — that decide whether any site
+may store cookies. The video sits in exactly the same place on both steps, and the second clip
+starts on the same frame the first one ends on.
+
+- **Allow** → `privacy.cookieConsent = "allowAll"`, no site is ever asked, cookies work normally.
+- **Don't allow** → `privacy.cookieConsent = "ask"`. The first visit to each new site raises a
+  `Cookie 权限` prompt; clicking **Deny** stops that origin from sending or receiving cookies.
+- **Skip** (step 1 only) → treated as *allow*; the intro is marked done and never shown again.
+
+Both states live in `settings.json`, are editable in **Settings → Privacy → Website cookie access**,
+and can be replayed from the command palette (*Replay the welcome tour*).
+
 ## Screenshots
 
 | Tabs | Plugins |
@@ -197,6 +246,14 @@ get a working plugin back.
 | Settings | Snake plugin |
 | --- | --- |
 | ![Settings](docs/settings.png) | ![Snake](docs/snake.png) |
+
+| First run | Cookie consent |
+| --- | --- |
+| ![Welcome](docs/welcome.png) | ![Cookie consent](docs/welcome-cookie.png) |
+
+| Dark theme | Dark settings |
+| --- | --- |
+| ![Dark home](docs/dark.png) | ![Dark settings](docs/dark-settings.png) |
 
 ## Keyboard shortcuts
 
